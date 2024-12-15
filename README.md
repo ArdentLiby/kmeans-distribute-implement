@@ -19,8 +19,11 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 ### 任务分工：
 
 金建新：贡献25%，负责hadoop环境搭建，实现MapReduce的K-means聚类算法
+
 李博洋：贡献25%，负责hadoop环境搭建，实现Flink的K-means聚类算法
+
 虞  果：贡献25%，负责hadoop环境搭建，实现Spark的K-means聚类算法
+
 夏意晨：贡献25%，负责hadoop环境搭建，资料整理，git仓库管理
 
 ## 环境配置：
