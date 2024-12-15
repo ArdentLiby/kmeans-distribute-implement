@@ -1,0 +1,6 @@
+org\example\Point.class
+org\example\KMeans$1.class
+org\example\KMeans.class
+org\example\KMeans$Tuple2.class
+org\example\Centroid.class
+org\example\KMeans$SelectNearestCenter.class
