@@ -85,11 +85,11 @@ tar -zxvf flink-1.11.2-bin-scala_2.11.tgz
 
 编写flink-conf.yaml文件，Master（172.19.0.2）作为jobmanager; Master（172.19.0.2），Slave1（172.19.0.3）和Slave2（172.19.0.4）作为taskmanager.
 
-![image-20241215174311327](assets/image-20241215174311327.png)
+![image-20241215174311327](/img/Flink集群搭建1.png)
 
-![image-20241215174535727](assets/image-20241215174535727.png)
+![image-20241215174535727](/img/Flink集群搭建2.png)
 
-![image-20241215174617347](assets/image-20241215174617347.png)
+![image-20241215174617347](/img/Flink集群搭建3.png)
 
 ## 实验具体流程：
 
