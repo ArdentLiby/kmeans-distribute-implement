@@ -74,6 +74,23 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 ![image-20241213163613794](/img/将spark文件文件传输到其他节点上2.png)
 
+### Flink集群搭建：
+
+官网下载Flink 1.11.2并解压：
+
+```
+docker cp flink-1.11.2-bin-scala_2.11.tgz hadoop-master:/root/shadow
+tar -zxvf flink-1.11.2-bin-scala_2.11.tgz
+```
+
+编写flink-conf.yaml文件，Master（172.19.0.2）作为jobmanager; Master（172.19.0.2），Slave1（172.19.0.3）和Slave2（172.19.0.4）作为taskmanager.
+
+![image-20241215174311327](assets/image-20241215174311327.png)
+
+![image-20241215174535727](assets/image-20241215174535727.png)
+
+![image-20241215174617347](assets/image-20241215174617347.png)
+
 ## 实验具体流程：
 
 ### 打开DockerDesktop：
