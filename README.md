@@ -20,85 +20,85 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 ### 安装windows版本Docker
 
-![image-20241213143319088](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213143319088.png)
+![image-20241213143319088](/img/windows版本Docker.png)
 
 ### 拉取docker镜像，初始化hadoop集群
 
-![image-20241213143416486](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213143416486.png)
+![image-20241213143416486](/img/初始化hadoop集群.png)
 
 ### 建立使用桥接模式的docker子网,使用桥接模式创建了一个172.19.0.0/16的子网出来
 
-![image-20241213143529676](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213143529676.png)
+![image-20241213143529676](/img/桥接.png)
 
 ### 使用拉取的镜像，启动三个容器，分别是Master,Slave1,Slave2作为集群的三个节点
 
-![image-20241213144914248](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213144914248.png)
+![image-20241213144914248](/img/启动容器1.png)
 
-![image-20241213144936298](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213144936298.png)
+![image-20241213144936298](/img/启动容器2.png)
 
-![image-20241213144951207](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213144951207.png)
+![image-20241213144951207](/img/启动容器3.png)
 
 ### 添加国内镜像源
 
-![image-20241213145243861](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213145243861.png)
+![image-20241213145243861](/img/添加国内镜像源.png)
 
 ### 对三台容器的/etc/host进行修改,对主机名进行映射
 
 ### 实现容器之间还有容器与宿主机的通信
 
-![image-20241213151402647](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213151402647.png)
+![image-20241213151402647](/img/实现容器之间还有容器与宿主机的通信1.png)
 
-![image-20241213151415546](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213151415546.png)
+![image-20241213151415546](/img/实现容器之间还有容器与宿主机的通信2.png)
 
 ### 拉取的镜像的环境变量默认配置在/etc/profile中
 
-![image-20241213151822519](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213151822519.png)
+![image-20241213151822519](/img/配置etcprofile.png)
 
 ### 启用容器的时候默认不会source /etc/profile,因此需要在bash的配置文件中添加语句 source /etc/profile,ssh 服务默认也是不会启用的，还需要在 bash的配置文件中添加service ssh start
 
-![image-20241213152127095](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213152127095.png)
+![image-20241213152127095](/img/添加service%20ssh%20start.png)
 
 ### Spark集群搭建
 
 ### 解压SPARK
 
-![image-20241213160710671](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213160710671.png)
+![image-20241213160710671](/img/解压SPARK.png)
 
 ### 配置worker工作节点
 
-![image-20241213161427537](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213161427537.png)
+![image-20241213161427537](/img/配置worker工作节点.png)
 
 ### 将spark文件文件传输到其他节点上
 
-![image-20241213163522783](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213163522783.png)
+![image-20241213163522783](/img/将spark文件文件传输到其他节点上1.png)
 
-![image-20241213163613794](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241213163613794.png)
+![image-20241213163613794](/img/将spark文件文件传输到其他节点上2.png)
 
 ## 实验具体流程：
 
 ### 打开DockerDesktop：
 
-![image-20241215131454296](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131454296.png)
+![image-20241215131454296](/img/打开DockerDesktop.png)
 
 ### 启动容器：
 
-![image-20241215131534760](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131534760.png)
+![image-20241215131534760](/img/启动容器.png)
 
 ### 分别进入容器的bash：
 
-![image-20241215131645146](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131645146.png)
+![image-20241215131645146](/img/分别进入容器的bash1.png)
 
-![image-20241215131657432](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131657432.png)
+![image-20241215131657432](/img/分别进入容器的bash2.png)
 
-![image-20241215131711265](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131711265.png)
+![image-20241215131711265](/img/分别进入容器的bash3.png)
 
 ### 启动Hadoop集群：
 
-![image-20241215131851222](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131851222.png)
+![image-20241215131851222](/img/启动Hadoop集群1.png)
 
-![image-20241215131945146](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215131945146.png)
+![image-20241215131945146](/img/启动Hadoop集群2.png)
 
-![image-20241215132033551](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215132033551.png)
+![image-20241215132033551](/img/启动Hadoop集群3.png)
 
 ## MapReduce
 
@@ -108,49 +108,49 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 (base) root@Master:/usr/local/hadoop# ./bin/hadoop jar ./hadoop_kmeans-1.0-SNAPSHOT\(1\).jar /input /output 4
 
-![image-20241215133554654](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215133554654.png)
+![image-20241215133554654](/img/启动MapReduce任务脚本.png)
 
 ### MapReduce总用时：
 
-![image-20241215133632742](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215133632742.png)
+![image-20241215133632742](/img/MapReduce总用时.png)
 
 ### MapReduce任务执行过程中Nodes的状态：
 
-![image-20241215133809401](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215133809401.png)
+![image-20241215133809401](/img/MapReduce任务执行过程中Nodes的状态.png)
 
 ### MapReduce任务输出结果：
 
-![image-20241215134302246](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215134302246.png)
+![image-20241215134302246](/img/MapReduce任务输出结果.png)
 
 ### 初始质心：
 
-![image-20241215134637521](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215134637521.png)
+![image-20241215134637521](/img/初始质心.png)
 
 ### Kmeans_cluster_result结果:
 
-![image-20241215134033758](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215134033758.png)
+![image-20241215134033758](/img/Kmeans_cluster_result结果.png)
 
 ### 聚类结果可视化：
 
-![image-20241214173349514](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241214173349514.png)
+![image-20241214173349514](/img/聚类结果可视化.png)
 
 ## Spark
 
 ### 启动spark：
 
-![image-20241215135323198](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215135323198.png)
+![image-20241215135323198](/img/启动spark1.png)
 
-![image-20241215135401550](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215135401550.png)
+![image-20241215135401550](/img/启动spark2.png)
 
-![image-20241215135425170](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215135425170.png)
+![image-20241215135425170](/img/启动spark3.png)
 
 ### 激活已创建的pytho3.8虚拟环境：
 
-![image-20241215135529631](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215135529631.png)
+![image-20241215135529631](/img/激活已创建的pytho3.8虚拟环境1.png)
 
-![image-20241215135602369](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215135602369.png)
+![image-20241215135602369](/img/激活已创建的pytho3.8虚拟环境1.png)
 
-![image-20241215135613768](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215135613768.png)
+![image-20241215135613768](/img/激活已创建的pytho3.8虚拟环境1.png)
 
 ### 启动Spark任务脚本：
 
@@ -158,29 +158,29 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 /usr/local/spark/bin/spark-submit --master spark://localhost:7077 /usr/local/spark/kmeans.py 4 0.01 /usr/local/spark/data.txt
 
-![image-20241215141154247](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215141154247.png)
+![image-20241215141154247](/img/启动Spark任务脚本.png)
 
 ### Spark运行总时间：
 
-![image-20241215141238954](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215141238954.png)
+![image-20241215141238954](/img/Spark运行总时间.png)
 
 ### Spark任务执行过程中Nodes的状态：
 
-![image-20241215142054142](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215142054142.png)
+![image-20241215142054142](/img/Spark任务执行过程中Nodes的状态.png)
 
 ## Flink
 
 ### Master启动 Flink 集群
 
-![image-20241215142659438](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215142659438.png)
+![image-20241215142659438](/img/Master启动%20Flink%20集群.png)
 
 ### Slave1和Slave2启动 Flink 集群中的 **TaskManager** 进程
 
 具体来说，**TaskManager** 是 Flink 集群的计算节点，负责执行实际的任务和处理数据流。Flink 采用 master-slave 架构，通常有一个 **JobManager** 和多个 **TaskManager**。JobManager 负责管理作业的调度和资源分配，而 TaskManager 则执行实际的数据处理任务。
 
-![image-20241215142924988](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215142924988.png)
+![image-20241215142924988](/img/Slave1启动%20Flink%20集群中的%20TaskManager%20进程.png)
 
-![image-20241215143026811](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215143026811.png)
+![image-20241215143026811](/img/Slave2启动%20Flink%20集群中的%20TaskManager%20进程.png)
 
 ### 启动Flink任务脚本：
 
@@ -188,7 +188,7 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 ### Flink运行总时间：
 
-![image-20241215153105173](C:\Users\金建新\AppData\Roaming\Typora\typora-user-images\image-20241215153105173.png)
+![image-20241215153105173](/img/Flink运行总时间.png)
 
 ## 实验总结：
 
