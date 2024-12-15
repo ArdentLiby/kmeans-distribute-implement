@@ -130,7 +130,6 @@ tar -zxvf flink-1.11.2-bin-scala_2.11.tgz
 ## MapReduce
 
 ### 启动MapReduce任务脚本：
-### 启动MapReduce任务脚本：
 
 ```
 (base) root@Master:/# cd /usr/local/hadoop
@@ -174,13 +173,13 @@ tar -zxvf flink-1.11.2-bin-scala_2.11.tgz
 
 ![image-20241215135425170](/img/启动spark3.png)
 
-### 激活已创建的pytho3.8虚拟环境：
+### 激活已创建的python3.8虚拟环境：
 
 ![image-20241215135529631](/img/激活已创建的pytho3.8虚拟环境1.png)
 
-![image-20241215135602369](/img/激活已创建的pytho3.8虚拟环境1.png)
+![image-20241215135602369](/img/激活已创建的pytho3.8虚拟环境2.png)
 
-![image-20241215135613768](/img/激活已创建的pytho3.8虚拟环境1.png)
+![image-20241215135613768](/img/激活已创建的pytho3.8虚拟环境3.png)
 
 ### 启动Spark任务脚本：
 
