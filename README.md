@@ -103,10 +103,13 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 ## MapReduce
 
 ### 启动MapReduce任务脚本：
+### 启动MapReduce任务脚本：
 
+```
 (base) root@Master:/# cd /usr/local/hadoop
 
 (base) root@Master:/usr/local/hadoop# ./bin/hadoop jar ./hadoop_kmeans-1.0-SNAPSHOT\(1\).jar /input /output 4
+```
 
 ![image-20241215133554654](/img/启动MapReduce任务脚本.png)
 
@@ -154,9 +157,12 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 ### 启动Spark任务脚本：
 
-先进入Spark环境，再
+先进入Spark环境，再运行
 
+```
 /usr/local/spark/bin/spark-submit --master spark://localhost:7077 /usr/local/spark/kmeans.py 4 0.01 /usr/local/spark/data.txt
+```
+
 
 ![image-20241215141154247](/img/启动Spark任务脚本.png)
 
@@ -184,7 +190,9 @@ K-means聚类是一种广泛应用的无监督学习算法，用于将数据集�
 
 ### 启动Flink任务脚本：
 
+```
 (base) root@Master:/usr/local/flink# flink run ./flink-kmeans-example-1.0-SNAPSHOT1.jar --points /usr/local/flink/flink_data.txt --centroids /usr/local/flink/centralid.txt --output /output --iterations 30
+```
 
 ### Flink运行总时间：
 
