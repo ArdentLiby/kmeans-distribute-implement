@@ -1,0 +1,370 @@
+CREATE OR REPLACE PROCEDURE WSR$CREATE_SNAPSHOT
+AS      
+    I_L_SNAP_ID        BINARY_INTEGER;
+    I_L_DBID           BINARY_INTEGER;
+    I_L_INSTANCE_ID    BINARY_INTEGER;
+    DT_L_STARTTIME     TIMESTAMP := SYSTIMESTAMP;
+    DT_L_SNAPDAY       DATE := TRUNC(SYSDATE);
+    I_L_COUNT          BINARY_INTEGER;
+    I_L_RET            BINARY_INTEGER;
+    I_L_FLAG           BINARY_INTEGER;
+    I_L_LENGTH         BINARY_INTEGER;
+BEGIN  
+    IF (GET_LOCK('SYS.WSR$CREATE_SNAPSHOT') <> 1) THEN
+        RETURN;
+    END IF;
+
+    SELECT SNAP_ID$.NEXTVAL
+      INTO I_L_SNAP_ID
+      FROM SYS_DUMMY;
+        
+    SELECT INSTANCE_ID
+      INTO I_L_INSTANCE_ID
+      FROM DV_INSTANCE;
+    
+    SELECT DBID
+      INTO I_L_DBID
+      FROM DV_DATABASE;
+
+    INSERT INTO WSR_SNAPSHOT
+          ( SNAP_ID,
+            DBID,
+            INSTANCE_ID,
+            STARTUP_TIME,
+            SNAP_TIME,
+            FLUSH_ELAPSED,
+            SESSIONS,
+            CURSORS
+          )
+    VALUES( I_L_SNAP_ID,
+            I_L_DBID,
+            I_L_INSTANCE_ID,
+            (SELECT STARTUP_TIME FROM DV_INSTANCE),
+            DT_L_STARTTIME,
+            NUMTODSINTERVAL((SYSDATE - CAST (DT_L_STARTTIME AS DATE)) * 86400, 'SECOND'),
+            (SELECT COUNT(*) FROM DV_SESSIONS),
+            (SELECT COUNT(*) FROM DV_OPEN_CURSORS)
+          );
+
+    INSERT INTO WSR_SYS_STAT
+              ( SNAP_ID,     
+                STAT_ID,     
+                STAT_NAME,
+                VALUE
+              )
+         SELECT I_L_SNAP_ID,
+                STATISTIC#,
+                NAME,
+                VALUE
+           FROM DV_SYS_STATS;	    
+	
+	INSERT INTO WSR_MES_STAT
+              ( SNAP_ID,	    
+                DESCRIPTION,	    
+                SEND,
+                RECV_PROCESS
+              )
+         SELECT I_L_SNAP_ID,
+                DESCRIPTION,
+                SEND,
+                RECV_PROCESS
+           FROM MES_STAT MES, DV_INSTANCE INST WHERE MES.INST_ID = INST.INSTANCE_ID ORDER BY SEND + RECV_PROCESS DESC;
+		   
+    INSERT INTO WSR_SYSTEM
+              ( SNAP_ID,     
+                STAT_ID,     
+                STAT_NAME,
+                VALUE
+              )
+         SELECT I_L_SNAP_ID,
+                ID,
+                NAME,
+                VALUE
+           FROM DV_SYSTEM;    
+    
+    INSERT INTO WSR_SYSTEM_EVENT
+              ( SNAP_ID,           
+                EVENT#,           
+                EVENT,           
+                WAIT_CLASS,       
+                TOTAL_WAITS,       
+                TIME_WAITED,       
+                TIME_WAITED_MIRCO, 
+                AVERAGE_WAIT,   
+                AVERAGE_WAIT_MIRCO
+              )  
+         SELECT I_L_SNAP_ID,
+                EVENT#,           
+                EVENT,           
+                WAIT_CLASS,       
+                TOTAL_WAITS,       
+                TIME_WAITED,       
+                TIME_WAITED_MIRCO, 
+                AVERAGE_WAIT,   
+                AVERAGE_WAIT_MIRCO
+           FROM DV_SYS_EVENTS;      
+    
+    INSERT INTO WSR_SYSTEM_EVENT  
+              ( SNAP_ID,           
+                EVENT#,           
+                EVENT,           
+                WAIT_CLASS,       
+                TOTAL_WAITS,       
+                TIME_WAITED,       
+                TIME_WAITED_MIRCO, 
+                AVERAGE_WAIT,   
+                AVERAGE_WAIT_MIRCO
+              )    
+         SELECT I_L_SNAP_ID,
+                -1,
+                'CPU',
+                '',
+                NULL,
+                VALUE/1000000,
+                VALUE,
+                NULL,
+                NULL
+           FROM WSR_SYS_STAT
+          WHERE SNAP_ID = I_L_SNAP_ID
+            AND STAT_ID = 2;    
+            
+    FOR ITEM IN (SELECT SQL_ID,         
+                        MIN(SQL_TEXT) SQL_TEXT,
+                        MIN(MODULE) MODULE,                
+                        SUM(EXECUTIONS) EXECUTIONS,     
+                        SUM(DISK_READS) DISK_READS,     
+                        SUM(BUFFER_GETS) BUFFER_GETS,     
+                        SUM(SORTS) SORTS,         
+                        SUM(PARSE_CALLS) PARSE_CALLS,     
+                        SUM(PROCESSED_ROWS) PROCESSED_ROWS, 
+                        SUM(IO_WAIT_TIME) IO_WAIT_TIME, 
+                        SUM(CON_WAIT_TIME) CON_WAIT_TIME, 
+                        SUM(DCS_NET_TIME) NET_WAIT_TIME,
+                        SUM(CPU_TIME) CPU_TIME, 
+                        SUM(NETWORK_TIME) NETWORK_TIME,
+                        SUM(ELAPSED_TIME) ELAPSED_TIME, 
+                        SUM(REF_COUNT) REF_COUNT,     
+                        SUM(CR_GETS) CR_GETS,
+                        SUM(PARSE_TIME) PARSE_TIME,
+                        MIN(PARSING_USER_NAME) PARSING_USER_NAME,  
+                        MIN(PROGRAM_ID) PROGRAM_ID,
+                        MIN(PROGRAM_LINE#) PROGRAM_LINE#,
+                        SUM(VM_FREE_PAGES) VM_PAGES_USED
+                   FROM DV_SQLS
+                  WHERE EXECUTIONS > 0
+                  GROUP BY SQL_ID) LOOP
+
+        
+        BEGIN
+            SELECT /*+RULE*/ FLAG, LENGTHB(SQL_TEXT)
+              INTO I_L_FLAG, I_L_LENGTH
+              FROM WSR_SQLTEXT
+             WHERE CTIME = DT_L_SNAPDAY
+               AND SQL_ID = ITEM.SQL_ID
+             LIMIT 1;   
+               
+            IF (I_L_FLAG = 1 AND I_L_LENGTH >= 1000) THEN
+
+                DELETE /*+RULE*/FROM WSR_SQLTEXT
+                 WHERE CTIME = DT_L_SNAPDAY
+                   AND SQL_ID = ITEM.SQL_ID
+                   AND FLAG = 1;                  
+            
+                INSERT INTO WSR_SQLTEXT
+                          ( CTIME,
+                            SQL_ID,
+                            SQL_TEXT,
+                            FLAG
+                          )
+                    VALUES( DT_L_SNAPDAY,
+                            ITEM.SQL_ID,
+                            ITEM.SQL_TEXT,
+                            2
+                          );            
+            END IF;
+               
+        EXCEPTION
+            WHEN NO_DATA_FOUND THEN
+                INSERT INTO WSR_SQLTEXT
+                          ( CTIME,
+                            SQL_ID,
+                            SQL_TEXT,
+                            FLAG
+                          )
+                    VALUES( DT_L_SNAPDAY,
+                            ITEM.SQL_ID,
+                            ITEM.SQL_TEXT,
+                            2
+                          );                                 
+        END;             
+        
+        INSERT INTO WSR_SQLAREA
+                  ( SNAP_ID, 
+                    SQL_ID,  
+                    SQL_TEXT,             
+                    MODULE,                
+                    EXECUTIONS,     
+                    DISK_READS,     
+                    BUFFER_GETS,     
+                    SORTS,         
+                    PARSE_CALLS,     
+                    PROCESSED_ROWS, 
+                    IO_WAIT_TIME, 
+                    CON_WAIT_TIME, 
+                    NET_WAIT_TIME,
+                    CPU_TIME,
+                    ELAPSED_TIME, 
+                    REF_COUNT,     
+                    IS_FREE,         
+                    CLEANED,
+                    CR_GETS,
+                    PARSE_TIME,
+                    PARSING_USER_NAME,  
+                    PROGRAM_ID,
+                    PROGRAM_LINE#,
+                    VM_PAGES_USED,
+                    NETWORK_TIME
+                  )
+            VALUES( I_L_SNAP_ID,
+                    ITEM.SQL_ID,     
+                    SUBSTRB(ITEM.SQL_TEXT, 1, 30),    
+                    ITEM.MODULE,                
+                    ITEM.EXECUTIONS,     
+                    ITEM.DISK_READS,     
+                    ITEM.BUFFER_GETS,     
+                    ITEM.SORTS,         
+                    ITEM.PARSE_CALLS,     
+                    ITEM.PROCESSED_ROWS, 
+                    ITEM.IO_WAIT_TIME, 
+                    ITEM.CON_WAIT_TIME, 
+                    ITEM.NET_WAIT_TIME,	
+                    ITEM.CPU_TIME,
+                    ITEM.ELAPSED_TIME, 
+                    ITEM.REF_COUNT,     
+                    NULL,         
+                    NULL,
+                    ITEM.CR_GETS,
+                    ITEM.PARSE_TIME,
+                    ITEM.PARSING_USER_NAME,  
+                    ITEM.PROGRAM_ID,
+                    ITEM.PROGRAM_LINE#,
+                    ITEM.VM_PAGES_USED,
+                    ITEM.NETWORK_TIME);
+    
+    END LOOP;         
+    
+    INSERT INTO WSR_PARAMETER
+              ( SNAP_ID, NAME, VALUE, RUNTIME_VALUE, DEFAULT_VALUE,     
+                ISDEFAULT, MODIFIABLE, DESCRIPTION, RANGE, 
+                DATATYPE, EFFECTIVE
+              )
+         SELECT I_L_SNAP_ID, NAME, VALUE, RUNTIME_VALUE, DEFAULT_VALUE,     
+                ISDEFAULT, MODIFIABLE, DESCRIPTION, RANGE, 
+                DATATYPE, EFFECTIVE
+           FROM DV_PARAMETERS;  
+           
+    INSERT INTO WSR_LATCH
+              ( SNAP_ID,   
+                ID,        
+                NAME,      
+                GETS,      
+                MISSES,    
+                SPIN_GETS, 
+                WAIT_TIME
+              )
+         SELECT I_L_SNAP_ID,
+                ID,        
+                NAME,      
+                GETS,      
+                MISSES,    
+                SPIN_GETS, 
+                WAIT_TIME              
+           FROM DV_LATCHS;
+    
+    INSERT INTO WSR_WAITSTAT
+              ( SNAP_ID, 
+                CLASS,   
+                COUNT,   
+                TIME 
+              )
+         SELECT I_L_SNAP_ID,
+                CLASS,   
+                COUNT,   
+                TIME            
+           FROM DV_WAIT_STATS;   
+       
+    INSERT INTO WSR_LIBRARYCACHE
+              ( SNAP_ID,     
+                NAMESPACE,   
+                GETS,        
+                GETHITS,     
+                PINS,        
+                PINHITS,     
+                RELOADS,     
+                INVLIDATIONS
+              )
+         SELECT I_L_SNAP_ID,
+                NAMESPACE,   
+                GETS,        
+                GETHITS,     
+                PINS,        
+                PINHITS,     
+                RELOADS,     
+                INVLIDATIONS           
+           FROM DV_LIBRARY_CACHE;
+       
+    INSERT INTO WSR_SEGMENT
+              ( SNAP_ID,       
+                OWNER,         
+                OBJECT_NAME,   
+                SUBOBJECT_NAME,
+                TS#,           
+                OBJECT_TYPE,   
+                STATISTIC_NAME,
+                STATISTIC#,    
+                VALUE
+              )
+         SELECT I_L_SNAP_ID, 
+                OWNER,         
+                OBJECT_NAME,   
+                SUBOBJECT_NAME,
+                TS#,           
+                OBJECT_TYPE,   
+                STATISTIC_NAME,
+                STATISTIC#,    
+                VALUE
+           FROM DV_SEGMENT_STATS
+          WHERE VALUE > 0;    
+
+    INSERT INTO WSR_SESSION_EVENTS
+              ( SNAP_ID,
+                SID,
+                EVENT#,
+                EVENT,
+                P1,
+                WAIT_CLASS,
+                TOTAL_WAITS,
+                TIME_WAITED_MIRCO
+              )
+         SELECT I_L_SNAP_ID,
+                SID,
+                EVENT#,
+                EVENT,
+                P1,
+                WAIT_CLASS,
+                TOTAL_WAITS,
+                TIME_WAITED_MIRCO
+           FROM DV_SESSION_EVENTS
+          WHERE WAIT_CLASS <> 'IDLE';
+          
+    UPDATE WSR_CONTROL SET MOST_RECENT_SNAP_TIME = DT_L_STARTTIME, MOST_RECENT_SNAP_ID = I_L_SNAP_ID;      
+ 
+    COMMIT;                
+    
+    I_L_RET := RELEASE_LOCK('SYS.WSR$CREATE_SNAPSHOT');
+              
+EXCEPTION
+    WHEN OTHERS THEN
+        I_L_RET := RELEASE_LOCK('SYS.WSR$CREATE_SNAPSHOT');
+        WSR$INSERT_ERRORLOG('WSR$CREATE_SNAPSHOT', SUBSTRB(SQL_ERR_MSG,1,2000));
+END;
